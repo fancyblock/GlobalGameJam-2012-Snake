@@ -26,7 +26,7 @@ public class LeafTask extends Task
 	static protected final String STATE_MATCHED = "state matched";
 	static protected final String STATE_PAUSE = "state pause";
 	
-	static protected final float ROUND = 360.0f;
+	static protected final float ROUND = (float)( Math.PI * 2 );
 	
 	//------------------------- private members -------------------------
 	
@@ -69,21 +69,17 @@ public class LeafTask extends Task
 	@Override
 	public void vEnd()
 	{
-		//TODO
 	}
 	
 	@Override
 	public void vDestroy()
 	{
-		//TODO
 	}
 	
 	@Override
 	public void vMain( float elapsed )
 	{
 		m_curAngle += m_angleInterval;
-			
-		//TODO
 	}
 	
 	@Override
@@ -133,7 +129,11 @@ public class LeafTask extends Task
 			leafAngle = m_curAngle + subLeaf._offset * m_angleInterval;
 			leafAngle = normalizeAngle( leafAngle );
 			
-			//TODO
+			// find the leaf that match the pattern
+			if( Math.abs( leafAngle ) < m_lvInfo._epsion )
+			{
+				return i;
+			}
 		}
 		
 		return -1;
@@ -147,6 +147,10 @@ public class LeafTask extends Task
 		if( ang > ROUND )
 		{
 			ang = ang % ROUND;
+		}
+		if( ang > ( ROUND / 2.0f ) )
+		{
+			ang = -( ROUND - ang );
 		}
 		
 		return ang;
