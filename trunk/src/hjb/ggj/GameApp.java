@@ -4,7 +4,9 @@
 package hjb.ggj;
 
 import haframework.HAApp;
-import hjb.ggj.tasks.TestTask;
+import hjb.ggj.ingame.GlobalWork;
+import hjb.ggj.tasks.LeafTask;
+import hjb.ggj.vo.LevelInfo;
 
 /**
  * @author hjb
@@ -24,7 +26,14 @@ public class GameApp extends HAApp
 	@Override
 	public void onCreate()
 	{
-		( new TestTask() ).Start( 0 );
+		// init the tasks
+		TaskSet._leafTask = new LeafTask();
+		
+		// init the first level	[temp]
+		GlobalWork._curLevel = new LevelInfo();
+		
+		//( new TestTask() ).Start( 0 );	//TEMP
+		TaskSet._leafTask.Start( 0 );
 	}
 	
 	@Override
