@@ -11,5 +11,6 @@ import haframework.task.Task;
  */
 public class TaskSet 
 {
+	static public Task _logoTask = null;
 	static public Task _leafTask = null;
 }
