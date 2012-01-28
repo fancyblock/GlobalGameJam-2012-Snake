@@ -224,7 +224,7 @@ public class RenderList
 		rb = m_renderBlocks.lastElement();
 		rb._vertexNum += 6;									// two trangles for one rectangle
 		
-		m_depth -= 0.001f;
+		m_depth -= 0.01f;
 		m_spriteNum++;
 	}
 	
