@@ -54,7 +54,7 @@ public class LogoTask extends Task
 	@Override
 	public void vDraw( float elapsed )
 	{
-		m_bg.Draw( 0, 0, 480, 320 );
+		m_bg.Draw( 0, 0, 320, 480 );
 	}
 
 }

@@ -5,6 +5,7 @@ package hjb.ggj.tasks;
 
 import haframework.draw.MovieClip;
 import haframework.draw.Sprite;
+import haframework.draw.SpriteFactory;
 import haframework.events.TouchEvent;
 import haframework.task.Task;
 import hjb.ggj.ingame.GlobalWork;
@@ -62,6 +63,13 @@ public class LeafTask extends Task
 		// init the graphics
 		m_leafs = new Sprite[m_lvInfo._leafCnt];
 		//TODO
+		m_snakeHead = SpriteFactory.Singleton().CreateMovieClip( hjb.ggj.R.drawable.snake_head, 167 );
+		m_snakeHead.AddFrame( 0, 0, 117, 65, 0, 0 );
+		m_snakeHead.AddFrame( 119, 0, 117, 65, 0, 0 );
+		m_snakeHead.AddFrame( 0, 67, 117, 65, 0, 0 );
+		m_snakeHead.AddFrame( 0, 134, 117, 65, 0, 0 );
+		m_snakeHead.SetPos( 50, 50 );
+		//TODO
 		
 		m_state = STATE_RUNNING;
 	}
@@ -80,11 +88,15 @@ public class LeafTask extends Task
 	public void vMain( float elapsed )
 	{
 		m_curAngle += m_angleInterval;
+		
+		m_snakeHead.Update( elapsed );
 	}
 	
 	@Override
 	public void vDraw( float elapsed )
 	{
+		m_snakeHead.Draw();
+		
 		//TODO
 	}
 	

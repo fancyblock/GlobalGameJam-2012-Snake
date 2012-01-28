@@ -80,7 +80,8 @@ public class MovieClip
 	public void Draw()
 	{
 		int frameIndex = (int)( m_time / m_interval );
-		frameIndex = UtilFunc.Min( frameIndex, m_allFrames.size() - 1 );
+		//frameIndex = UtilFunc.Min( frameIndex, m_allFrames.size() - 1 );
+		frameIndex = frameIndex % m_allFrames.size();
 		
 		frameInfo fi = m_allFrames.get( frameIndex );
 		m_sprite.SetUV( fi._u, fi._v, fi._wid, fi._hei );
