@@ -23,7 +23,7 @@ public class Ggj2012Activity extends Activity
     {
     	m_app = new GameApp();
     	Config cfg = new Config();
-    	cfg._orientation = Config.ORIENTATION_LANDSCAPE;
+    	cfg._orientation = Config.ORIENTATION_PORTRAIT;
     	m_app.Create( cfg );
     	m_app.Start();
     	

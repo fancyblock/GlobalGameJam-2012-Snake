@@ -4,10 +4,9 @@
 package hjb.ggj;
 
 import haframework.HAApp;
-import hjb.ggj.ingame.GlobalWork;
 import hjb.ggj.tasks.LeafTask;
 import hjb.ggj.tasks.LogoTask;
-import hjb.ggj.vo.LevelInfo;
+import hjb.ggj.tasks.TransitionTask;
 
 /**
  * @author hjb
@@ -30,6 +29,7 @@ public class GameApp extends HAApp
 		// init the tasks
 		TaskSet._logoTask = new LogoTask();
 		TaskSet._leafTask = new LeafTask();
+		TaskSet._transTask = new TransitionTask();
 		
 		//TODO
 		
