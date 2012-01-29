@@ -52,10 +52,10 @@ public class LevelFactory
 	public LevelInfo CreateLevel( int level )
 	{
 		LevelInfo li = new LevelInfo();
-		li._subLeaves = new SubLeafInfo[24];
+		li._subLeaves = new SubLeafInfo[23];
 		li._leafCnt = 0;
 		
-		for( int i = 0; i <= 24; i++ )
+		for( int i = 0; i <= 23; i++ )
 		{
 			if( Math.random() > 0.6f )
 			{

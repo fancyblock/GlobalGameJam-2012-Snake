@@ -7,9 +7,12 @@ import haframework.draw.MovieClip;
 import haframework.draw.Sprite;
 import haframework.draw.SpriteFactory;
 import haframework.events.TouchEvent;
+import haframework.sound.SoundManager;
 import haframework.task.Task;
 import hjb.ggj.ingame.GlobalWork;
 import hjb.ggj.ingame.InGameCommon;
+import hjb.ggj.ingame.LevelFactory;
+import hjb.ggj.ingame.ProgressUI;
 import hjb.ggj.ingame.SubLeafFactory;
 import hjb.ggj.vo.LevelInfo;
 import hjb.ggj.vo.SubLeafInfo;
@@ -40,11 +43,14 @@ public class LeafTask extends Task
 	protected Sprite m_snakeBody = null;
 	protected MovieClip m_snakeHead = null;
 	protected Sprite m_leafs[] = null;
-	protected Sprite m_aimLeaf = null;
 	protected Sprite m_aimFrame1 = null;
 	protected Sprite m_aimFrame2 = null;
+	protected Sprite m_levels[] = null;
 	
 	protected String m_state = null;
+	protected int m_mark = 0;
+	
+	protected ProgressUI m_progressUI = null;
 	
 	//------------------------- public functions -------------------------
 	
@@ -65,13 +71,12 @@ public class LeafTask extends Task
 		m_angleInterval = InGameCommon._angleInterval;
 		
 		// init the graphics
-		m_leafs = new Sprite[m_lvInfo._leafCnt];
-		for( int i = 0; i < m_lvInfo._leafCnt; i++ )
+		m_leafs = new Sprite[9];
+		for( int i = 0; i < 9; i++ )
 		{
-			SubLeafInfo sli = m_lvInfo._subLeaves[i];
-			m_leafs[i] = SpriteFactory.Singleton().CreateSprite( sli._resId );
-			m_leafs[i].SetUV( sli._u, sli._v, 32, 64 );
-			m_leafs[i].SetAnchor( 16, 155 );
+			SubLeafInfo li = SubLeafFactory.Singleton().CreateSubLeaf( i );
+			m_leafs[i] = SpriteFactory.Singleton().CreateSprite( li._resId );
+			m_leafs[i].SetUV( li._u, li._v, 32, 64 );
 		}
 		m_snakeHead = SpriteFactory.Singleton().CreateMovieClip( hjb.ggj.R.drawable.snake_head_leaf, 167 );
 		m_snakeHead.AddFrame( 0, 0, 117, 65, 0, 0 );
@@ -82,10 +87,6 @@ public class LeafTask extends Task
 		m_snakeBody = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
 		m_snakeBody.SetUV( 0, 0, 181, 181 );
 		m_snakeBody.SetAnchor( 90.5f, 90.5f );
-		SubLeafInfo li = SubLeafFactory.Singleton().CreateSubLeaf( m_lvInfo._matchLeafType );
-		m_aimLeaf = SpriteFactory.Singleton().CreateSprite( li._resId );
-		m_aimLeaf.SetUV( li._u, li._v, 32, 64 );
-		m_aimLeaf.SetAnchor( 16, 32 );
 		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.bg );
 		m_bg.SetUV( 0.0f, 0.0f, 1.0f, 1.0f );
 		m_aimFrame1 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
@@ -94,9 +95,29 @@ public class LeafTask extends Task
 		m_aimFrame2 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
 		m_aimFrame2.SetUV( 316, 0, 131, 116 );
 		m_aimFrame2.SetAnchor( 65.5f, 58.0f );
+		m_levels = new Sprite[6];
+		m_levels[0] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_levels[0].SetUV( 0, 0, 320, 217 );
+		m_levels[1] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_levels[1].SetUV( 322, 0, 320, 217 );
+		m_levels[2] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_levels[2].SetUV( 644, 0, 320, 217 );
+		m_levels[3] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_levels[3].SetUV( 0, 219, 320, 217 );
+		m_levels[4] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_levels[4].SetUV( 0, 438, 320, 217 );
+		m_levels[5] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_levels[5].SetUV( 0, 657, 320, 217 );
 		//TODO
 		
 		m_state = STATE_RUNNING;
+		m_mark = 0;
+		
+		// initial sounds
+		SoundManager.Singleton().LoadSoundBGM( hjb.ggj.R.raw.bgm, "bgm" );
+		SoundManager.Singleton().PlayBGM( "bgm" );
+		SoundManager.Singleton().LoadSound( hjb.ggj.R.raw.right, "right" );
+		SoundManager.Singleton().LoadSound( hjb.ggj.R.raw.wrong, "wrong" );
 	}
 	
 	@Override
@@ -121,6 +142,7 @@ public class LeafTask extends Task
 	public void vDraw( float elapsed )
 	{
 		m_bg.Draw( 0, 0, 320, 560 );
+		m_levels[m_mark].Draw( 0, 20 );
 		
 		//TODO
 		
@@ -130,6 +152,7 @@ public class LeafTask extends Task
 		SubLeafInfo subLeaf;
 		float leafAngle;
 		
+		boolean aimLeaf = false;
 		for( i = 0; i < m_lvInfo._leafCnt; i++ )
 		{
 			subLeaf = m_lvInfo._subLeaves[i];
@@ -137,13 +160,20 @@ public class LeafTask extends Task
 			leafAngle = m_curAngle + subLeaf._offset * m_angleInterval;
 			leafAngle = normalizeAngle( leafAngle );
 			
-			m_leafs[i].Draw( 160, 386, -leafAngle );
+			m_leafs[subLeaf._type].SetAnchor( 16, 155 );
+			m_leafs[subLeaf._type].Draw( 160, 386, -leafAngle );
+			
+			if( subLeaf._type == m_lvInfo._matchLeafType && !aimLeaf )
+			{
+				m_leafs[subLeaf._type].SetAnchor( 16, 32 );
+				m_leafs[subLeaf._type].Draw( 160.0f, 386.0f );
+				
+				aimLeaf = true;
+			}
 		}
 		
 		m_snakeBody.Draw( 160.0f, 386.0f, -m_curAngle );
 		m_snakeHead.Draw();
-		
-		m_aimLeaf.Draw( 160.0f, 386.0f );
 		
 		//TODO 
 	}
@@ -161,12 +191,28 @@ public class LeafTask extends Task
 				
 				if( index >= 0 )
 				{
-					//TODO
+					if( m_mark < 5 )
+					{
+						m_mark++;
+						
+						m_lvInfo = LevelFactory.Singleton().CreateLevel( 0 );
+						
+						//TODO
+						
+						SoundManager.Singleton().PlaySE( "right" );
+					}
+					else
+					{
+						//TODO		level complete
+					}
 					
-					m_state = STATE_MATCHED;
+					//m_state = STATE_MATCHED;
 					
 					return true;
 				}
+				
+				// wrong
+				SoundManager.Singleton().PlaySE( "wrong" );
 			}
 		}
 		
