@@ -8,7 +8,7 @@ import haframework.draw.SpriteFactory;
 import haframework.task.Task;
 import hjb.ggj.TaskSet;
 import hjb.ggj.ingame.GlobalWork;
-import hjb.ggj.vo.LevelInfo;
+import hjb.ggj.ingame.LevelFactory;
 
 /**
  * @author hejiabin
@@ -30,7 +30,7 @@ public class LogoTask extends Task
 	@Override
 	public void vBegin()
 	{
-		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.ggjlogo );
+		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.ggj2012logo );
 		m_bg.SetUV( 0.0f, 0.0f, 1.0f, 1.0f );
 		
 		m_time = 0.0f;
@@ -41,10 +41,10 @@ public class LogoTask extends Task
 	{
 		m_time += 0.1f;
 		
-		if( m_time > 10.0f )
+		if( m_time > 15.0f )
 		{
 			// init the first level	[temp]
-			GlobalWork._curLevel = new LevelInfo();
+			GlobalWork._curLevel = LevelFactory.Singleton().CreateLevel( 1 );
 			
 			this.Stop();
 			TaskSet._leafTask.Start( 0 );
@@ -54,7 +54,7 @@ public class LogoTask extends Task
 	@Override
 	public void vDraw( float elapsed )
 	{
-		m_bg.Draw( 0, 0, 320, 480 );
+		m_bg.Draw( 0, 0, 320, 560 );
 	}
 
 }

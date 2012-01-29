@@ -10,6 +10,7 @@ import haframework.events.TouchEvent;
 import haframework.task.Task;
 import hjb.ggj.ingame.GlobalWork;
 import hjb.ggj.ingame.InGameCommon;
+import hjb.ggj.ingame.SubLeafFactory;
 import hjb.ggj.vo.LevelInfo;
 import hjb.ggj.vo.SubLeafInfo;
 
@@ -35,10 +36,13 @@ public class LeafTask extends Task
 	protected float m_curAngle = 0.0f;
 	protected float m_angleInterval = 0;
 	
-	protected Sprite m_leafBg = null;
+	protected Sprite m_bg = null;
 	protected Sprite m_snakeBody = null;
 	protected MovieClip m_snakeHead = null;
 	protected Sprite m_leafs[] = null;
+	protected Sprite m_aimLeaf = null;
+	protected Sprite m_aimFrame1 = null;
+	protected Sprite m_aimFrame2 = null;
 	
 	protected String m_state = null;
 	
@@ -62,13 +66,34 @@ public class LeafTask extends Task
 		
 		// init the graphics
 		m_leafs = new Sprite[m_lvInfo._leafCnt];
-		//TODO
-		m_snakeHead = SpriteFactory.Singleton().CreateMovieClip( hjb.ggj.R.drawable.snake_head, 167 );
+		for( int i = 0; i < m_lvInfo._leafCnt; i++ )
+		{
+			SubLeafInfo sli = m_lvInfo._subLeaves[i];
+			m_leafs[i] = SpriteFactory.Singleton().CreateSprite( sli._resId );
+			m_leafs[i].SetUV( sli._u, sli._v, 32, 64 );
+			m_leafs[i].SetAnchor( 16, 155 );
+		}
+		m_snakeHead = SpriteFactory.Singleton().CreateMovieClip( hjb.ggj.R.drawable.snake_head_leaf, 167 );
 		m_snakeHead.AddFrame( 0, 0, 117, 65, 0, 0 );
 		m_snakeHead.AddFrame( 119, 0, 117, 65, 0, 0 );
 		m_snakeHead.AddFrame( 0, 67, 117, 65, 0, 0 );
 		m_snakeHead.AddFrame( 0, 134, 117, 65, 0, 0 );
-		m_snakeHead.SetPos( 50, 50 );
+		m_snakeHead.SetPos( 88, 284 );
+		m_snakeBody = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
+		m_snakeBody.SetUV( 0, 0, 181, 181 );
+		m_snakeBody.SetAnchor( 90.5f, 90.5f );
+		SubLeafInfo li = SubLeafFactory.Singleton().CreateSubLeaf( m_lvInfo._matchLeafType );
+		m_aimLeaf = SpriteFactory.Singleton().CreateSprite( li._resId );
+		m_aimLeaf.SetUV( li._u, li._v, 32, 64 );
+		m_aimLeaf.SetAnchor( 16, 32 );
+		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.bg );
+		m_bg.SetUV( 0.0f, 0.0f, 1.0f, 1.0f );
+		m_aimFrame1 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
+		m_aimFrame1.SetUV( 183, 0, 131, 116 );
+		m_aimFrame1.SetAnchor( 65.5f, 58.0f );
+		m_aimFrame2 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
+		m_aimFrame2.SetUV( 316, 0, 131, 116 );
+		m_aimFrame2.SetAnchor( 65.5f, 58.0f );
 		//TODO
 		
 		m_state = STATE_RUNNING;
@@ -87,7 +112,7 @@ public class LeafTask extends Task
 	@Override
 	public void vMain( float elapsed )
 	{
-		m_curAngle += m_angleInterval;
+		m_curAngle += this.m_lvInfo._rotateSpeed;
 		
 		m_snakeHead.Update( elapsed );
 	}
@@ -95,9 +120,32 @@ public class LeafTask extends Task
 	@Override
 	public void vDraw( float elapsed )
 	{
-		m_snakeHead.Draw();
+		m_bg.Draw( 0, 0, 320, 560 );
 		
 		//TODO
+		
+		m_aimFrame1.Draw( 160, 258 );
+		
+		int i;
+		SubLeafInfo subLeaf;
+		float leafAngle;
+		
+		for( i = 0; i < m_lvInfo._leafCnt; i++ )
+		{
+			subLeaf = m_lvInfo._subLeaves[i];
+			
+			leafAngle = m_curAngle + subLeaf._offset * m_angleInterval;
+			leafAngle = normalizeAngle( leafAngle );
+			
+			m_leafs[i].Draw( 160, 386, -leafAngle );
+		}
+		
+		m_snakeBody.Draw( 160.0f, 386.0f, -m_curAngle );
+		m_snakeHead.Draw();
+		
+		m_aimLeaf.Draw( 160.0f, 386.0f );
+		
+		//TODO 
 	}
 	
 	@Override
@@ -142,7 +190,7 @@ public class LeafTask extends Task
 			leafAngle = normalizeAngle( leafAngle );
 			
 			// find the leaf that match the pattern
-			if( Math.abs( leafAngle ) < m_lvInfo._epsion )
+			if( Math.abs( leafAngle ) < m_lvInfo._epsion && subLeaf._type == m_lvInfo._matchLeafType )
 			{
 				return i;
 			}

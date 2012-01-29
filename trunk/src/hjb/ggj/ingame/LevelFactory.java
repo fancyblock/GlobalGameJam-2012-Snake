@@ -4,6 +4,7 @@
 package hjb.ggj.ingame;
 
 import hjb.ggj.vo.LevelInfo;
+import hjb.ggj.vo.SubLeafInfo;
 
 /**
  * @author hejiabin
@@ -51,8 +52,22 @@ public class LevelFactory
 	public LevelInfo CreateLevel( int level )
 	{
 		LevelInfo li = new LevelInfo();
+		li._subLeaves = new SubLeafInfo[24];
+		li._leafCnt = 0;
 		
-		//TODO
+		for( int i = 0; i <= 24; i++ )
+		{
+			if( Math.random() > 0.6f )
+			{
+				li._subLeaves[li._leafCnt] = SubLeafFactory.Singleton().CreateSubLeaf( (int)( Math.random() * 9 ) );
+				li._subLeaves[li._leafCnt]._offset = i;
+				
+				li._leafCnt ++;
+			}
+		}
+		
+		// set a leaf for match
+		li._matchLeafType = li._subLeaves[(int)( Math.random() * li._leafCnt )]._type;
 		
 		return li;
 	}

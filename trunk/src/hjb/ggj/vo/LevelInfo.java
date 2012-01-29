@@ -9,8 +9,8 @@ package hjb.ggj.vo;
  */
 public class LevelInfo 
 {
-	public float _rotateSpeed = 1.0f;
-	public float _epsion = 3.0f;
+	public float _rotateSpeed = 0.015f;
+	public float _epsion = 0.08f;
 	
 	public int _leafCnt = 0;
 	public SubLeafInfo _subLeaves[] = null;
@@ -20,7 +20,7 @@ public class LevelInfo
 	 * @desc	constructor
 	 */
 	public LevelInfo() 
-	{
+	{	
 		// TODO Auto-generated constructor stub
 	}
 
