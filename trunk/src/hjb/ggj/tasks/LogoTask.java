@@ -7,8 +7,6 @@ import haframework.draw.Sprite;
 import haframework.draw.SpriteFactory;
 import haframework.task.Task;
 import hjb.ggj.TaskSet;
-import hjb.ggj.ingame.GlobalWork;
-import hjb.ggj.ingame.LevelFactory;
 
 /**
  * @author hejiabin
@@ -43,11 +41,8 @@ public class LogoTask extends Task
 		
 		if( m_time > 15.0f )
 		{
-			// init the first level	[temp]
-			GlobalWork._curLevel = LevelFactory.Singleton().CreateLevel( 1 );
-			
 			this.Stop();
-			TaskSet._leafTask.Start( 0 );
+			TaskSet._titleTask.Start( 0 );
 		}
 	}
 	
