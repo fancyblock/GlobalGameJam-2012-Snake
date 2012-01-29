@@ -9,6 +9,7 @@ import haframework.draw.SpriteFactory;
 import haframework.events.TouchEvent;
 import haframework.sound.SoundManager;
 import haframework.task.Task;
+import hjb.ggj.TaskSet;
 import hjb.ggj.ingame.GlobalWork;
 import hjb.ggj.ingame.InGameCommon;
 import hjb.ggj.ingame.LevelFactory;
@@ -28,7 +29,8 @@ public class LeafTask extends Task
 	//-------------------------- static members -------------------------
 	
 	static protected final String STATE_RUNNING = "state running";
-	static protected final String STATE_MATCHED = "state matched";
+	static protected final String STATE_COMPLETE = "state complete";
+	static protected final String STATE_GAMEOVER = "state gameover";
 	static protected final String STATE_PAUSE = "state pause";
 	
 	static protected final float ROUND = (float)( Math.PI * 2 );
@@ -40,15 +42,23 @@ public class LeafTask extends Task
 	protected float m_angleInterval = 0;
 	
 	protected Sprite m_bg = null;
+	protected Sprite m_bg2 = null;
 	protected Sprite m_snakeBody = null;
 	protected MovieClip m_snakeHead = null;
 	protected Sprite m_leafs[] = null;
 	protected Sprite m_aimFrame1 = null;
 	protected Sprite m_aimFrame2 = null;
+	protected Sprite m_aimFrame3 = null;
 	protected Sprite m_levels[] = null;
+	protected Sprite m_bigSnake1 = null;
+	protected Sprite m_bigSnake2 = null;
+	protected Sprite m_failMark = null;
 	
 	protected String m_state = null;
 	protected int m_mark = 0;
+	protected int m_failTimes = 0;
+	protected int m_bigSnakeTime = 0;
+	protected int m_gameOverTime = 0;
 	
 	protected ProgressUI m_progressUI = null;
 	
@@ -89,12 +99,17 @@ public class LeafTask extends Task
 		m_snakeBody.SetAnchor( 90.5f, 90.5f );
 		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.bg );
 		m_bg.SetUV( 0.0f, 0.0f, 1.0f, 1.0f );
+		m_bg2 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.bg2 );
+		m_bg2.SetUV( 0.0f, 0.0f, 1.0f, 1.0f );
 		m_aimFrame1 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
 		m_aimFrame1.SetUV( 183, 0, 131, 116 );
 		m_aimFrame1.SetAnchor( 65.5f, 58.0f );
 		m_aimFrame2 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
 		m_aimFrame2.SetUV( 316, 0, 131, 116 );
 		m_aimFrame2.SetAnchor( 65.5f, 58.0f );
+		m_aimFrame3 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
+		m_aimFrame3.SetUV( 321, 199, 131, 116 );
+		m_aimFrame3.SetAnchor( 65.5f, 58.0f );
 		m_levels = new Sprite[6];
 		m_levels[0] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
 		m_levels[0].SetUV( 0, 0, 320, 217 );
@@ -108,19 +123,26 @@ public class LeafTask extends Task
 		m_levels[4].SetUV( 0, 438, 320, 217 );
 		m_levels[5] = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
 		m_levels[5].SetUV( 0, 657, 320, 217 );
-		//TODO
+		m_bigSnake1 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_bigSnake1.SetUV( 344, 304, 320, 512 );
+		m_bigSnake2 = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.achieve_bg );
+		m_bigSnake2.SetUV( 686, 302, 320, 512 );
+		m_failMark = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.deco );
+		m_failMark.SetUV( 243, 244, 26, 25 );
 		
 		m_progressUI = new ProgressUI();
 		m_progressUI.SetMark( 0 );
 		
 		m_state = STATE_RUNNING;
 		m_mark = 0;
+		m_failTimes = 0;
 		
 		// initial sounds
 		SoundManager.Singleton().LoadSoundBGM( hjb.ggj.R.raw.bgm, "bgm" );
 		SoundManager.Singleton().PlayBGM( "bgm" );
 		SoundManager.Singleton().LoadSound( hjb.ggj.R.raw.right, "right" );
 		SoundManager.Singleton().LoadSound( hjb.ggj.R.raw.wrong, "wrong" );
+		SoundManager.Singleton().LoadSound( hjb.ggj.R.raw.eat, "eat" );
 	}
 	
 	@Override
@@ -140,19 +162,77 @@ public class LeafTask extends Task
 		
 		m_snakeHead.Update( elapsed );
 		m_progressUI.Update( elapsed );
+		
+		if( m_state == STATE_GAMEOVER )
+		{
+			m_gameOverTime++;
+			
+			if( m_gameOverTime > 50 )
+			{
+				SoundManager.Singleton().StopAll();
+				//TODO
+				
+				this.Stop();
+				TaskSet._gameOverTask.Start( 0 );
+			}
+		}
 	}
 	
 	@Override
 	public void vDraw( float elapsed )
 	{
 		m_bg.Draw( 0, 0, 320, 560 );
-		m_levels[m_mark].Draw( 0, 20 );
 		
+		if( m_state == STATE_COMPLETE )
+		{
+			if( m_bigSnakeTime < 50 )
+			{
+				m_bigSnake1.Draw( 0, 100 - m_bigSnakeTime * 6 );
+			}
+			else if( m_bigSnakeTime < 70 )
+			{
+				m_bigSnake1.Draw( 0, -200 );
+			}
+			
+			if( m_bigSnakeTime > 70 )
+			{
+				m_levels[0].Draw( 0, 20 );
+			}
+			else
+			{
+				m_levels[m_mark].Draw( 0, 20 );
+			}
+			
+			if( m_bigSnakeTime >= 50 )
+			{	
+				m_bigSnake2.Draw( 0, -512 + ( m_bigSnakeTime - 50 ) * 13 );
+			}
+			
+			m_bigSnakeTime++;
+			
+			if( m_bigSnakeTime > 140 )
+			{
+				restart();
+			}
+		}
+		else
+		{
+			m_levels[m_mark].Draw( 0, 20 );
+		}
+		
+		m_bg2.Draw( 0, 237, 320, 323 );
 		m_progressUI.Draw( 45, 20 );
 		
 		m_aimFrame1.Draw( 160, 258 );
+//		m_aimFrame2.Draw( 160, 258 );
+//		m_aimFrame3.Draw( 160, 258 );
 		
 		int i;
+		for( i = 0; i < m_failTimes; i++ )
+		{
+			m_failMark.Draw( 225 + i * 28, 530 );
+		}
+		
 		SubLeafInfo subLeaf;
 		float leafAngle;
 		
@@ -170,7 +250,7 @@ public class LeafTask extends Task
 			if( subLeaf._type == m_lvInfo._matchLeafType && !aimLeaf )
 			{
 				m_leafs[subLeaf._type].SetAnchor( 16, 32 );
-				m_leafs[subLeaf._type].Draw( 160.0f, 386.0f );
+				m_leafs[subLeaf._type].Draw( 160.0f, 386.0f, m_lvInfo._aimAngle );
 				
 				aimLeaf = true;
 			}
@@ -178,10 +258,8 @@ public class LeafTask extends Task
 		
 		m_snakeBody.Draw( 160.0f, 386.0f, -m_curAngle );
 		m_snakeHead.Draw();
-		
-		//TODO 
 	}
-	
+
 	@Override
 	public boolean vOnTouchEvent( Vector<TouchEvent> events )
 	{
@@ -208,16 +286,23 @@ public class LeafTask extends Task
 					}
 					else
 					{
-						//TODO		level complete
+						levelComplete();
 					}
-					
-					//m_state = STATE_MATCHED;
 					
 					return true;
 				}
-				
-				// wrong
-				SoundManager.Singleton().PlaySE( "wrong" );
+				else
+				{
+					// wrong
+					SoundManager.Singleton().PlaySE( "wrong" );
+					
+					m_failTimes++;
+					
+					if( m_failTimes >= 3 )
+					{
+						m_state = STATE_GAMEOVER;
+					}
+				}
 			}
 		}
 		
@@ -226,6 +311,26 @@ public class LeafTask extends Task
 	
 	//------------------------- private function -------------------------
 	
+	private void restart()
+	{
+		m_lvInfo = LevelFactory.Singleton().CreateLevel( 0 );
+		m_state = STATE_RUNNING;
+		m_mark = 0;
+		m_failTimes = 0;
+		
+		m_lvInfo._rotateSpeed += 0.01f;
+	}
+	
+	// show the animation of the snake
+	private void levelComplete()
+	{
+		m_state = STATE_COMPLETE;
+		
+		m_bigSnakeTime = 0;
+		
+		SoundManager.Singleton().PlaySE( "eat" );
+	}
+
 	// judge if the leaf is match the current pattern
 	protected int matchLeaf()
 	{

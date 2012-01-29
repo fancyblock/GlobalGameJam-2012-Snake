@@ -4,6 +4,8 @@
 package hjb.ggj;
 
 import haframework.HAApp;
+import haframework.sound.SoundManager;
+import hjb.ggj.tasks.GameOverTask;
 import hjb.ggj.tasks.LeafTask;
 import hjb.ggj.tasks.LogoTask;
 import hjb.ggj.tasks.TransitionTask;
@@ -30,6 +32,7 @@ public class GameApp extends HAApp
 		TaskSet._logoTask = new LogoTask();
 		TaskSet._leafTask = new LeafTask();
 		TaskSet._transTask = new TransitionTask();
+		TaskSet._gameOverTask = new GameOverTask();
 		
 		//TODO
 		
@@ -39,7 +42,7 @@ public class GameApp extends HAApp
 	@Override
 	public void onDestory()
 	{
-		//TODO
+		SoundManager.Singleton().StopAll();
 	}
 
 }
