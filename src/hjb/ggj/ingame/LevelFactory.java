@@ -54,6 +54,7 @@ public class LevelFactory
 		LevelInfo li = new LevelInfo();
 		li._subLeaves = new SubLeafInfo[23];
 		li._leafCnt = 0;
+		li._aimAngle = (float)Math.random();
 		
 		for( int i = 0; i <= 23; i++ )
 		{
