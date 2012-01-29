@@ -8,6 +8,7 @@ import haframework.sound.SoundManager;
 import hjb.ggj.tasks.GameOverTask;
 import hjb.ggj.tasks.LeafTask;
 import hjb.ggj.tasks.LogoTask;
+import hjb.ggj.tasks.TestTask;
 import hjb.ggj.tasks.TransitionTask;
 
 /**
@@ -33,6 +34,7 @@ public class GameApp extends HAApp
 		TaskSet._leafTask = new LeafTask();
 		TaskSet._transTask = new TransitionTask();
 		TaskSet._gameOverTask = new GameOverTask();
+		TaskSet._titleTask = new TestTask();
 		
 		//TODO
 		

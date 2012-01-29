@@ -59,6 +59,7 @@ public class LeafTask extends Task
 	protected int m_failTimes = 0;
 	protected int m_bigSnakeTime = 0;
 	protected int m_gameOverTime = 0;
+	protected int m_sunFlashTime = 0;
 	
 	protected ProgressUI m_progressUI = null;
 	
@@ -158,7 +159,7 @@ public class LeafTask extends Task
 	@Override
 	public void vMain( float elapsed )
 	{
-		m_curAngle += this.m_lvInfo._rotateSpeed;
+		m_curAngle += GlobalWork._rotateSpeed;
 		
 		m_snakeHead.Update( elapsed );
 		m_progressUI.Update( elapsed );
@@ -223,9 +224,16 @@ public class LeafTask extends Task
 		m_bg2.Draw( 0, 237, 320, 323 );
 		m_progressUI.Draw( 45, 20 );
 		
-		m_aimFrame1.Draw( 160, 258 );
-//		m_aimFrame2.Draw( 160, 258 );
-//		m_aimFrame3.Draw( 160, 258 );
+		if( m_sunFlashTime > 0 )
+		{
+			m_aimFrame1.Draw( 160, 258 );
+			m_sunFlashTime--;
+		}
+		else
+		{
+			m_aimFrame2.Draw( 160, 258 );
+		}
+		//m_aimFrame3.Draw( 160, 258 );
 		
 		int i;
 		for( i = 0; i < m_failTimes; i++ )
@@ -280,7 +288,7 @@ public class LeafTask extends Task
 						
 						m_lvInfo = LevelFactory.Singleton().CreateLevel( 0 );
 						
-						//TODO
+						m_sunFlashTime = 14;
 						
 						SoundManager.Singleton().PlaySE( "right" );
 					}
@@ -317,8 +325,10 @@ public class LeafTask extends Task
 		m_state = STATE_RUNNING;
 		m_mark = 0;
 		m_failTimes = 0;
+		m_sunFlashTime = 0;
+		m_progressUI.SetMark( 0 );
 		
-		m_lvInfo._rotateSpeed += 0.01f;
+		GlobalWork._rotateSpeed += 0.005f;
 	}
 	
 	// show the animation of the snake

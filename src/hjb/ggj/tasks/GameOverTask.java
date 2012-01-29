@@ -3,37 +3,44 @@
  */
 package hjb.ggj.tasks;
 
-import java.util.Vector;
-
 import haframework.draw.Sprite;
 import haframework.draw.SpriteFactory;
 import haframework.events.TouchEvent;
 import haframework.task.Task;
 import hjb.ggj.TaskSet;
-import hjb.ggj.ingame.GlobalWork;
-import hjb.ggj.ingame.LevelFactory;
+
+import java.util.Vector;
 
 /**
  * @author hjb
  *
  */
-public class TestTask extends Task
+public class GameOverTask extends Task
 {
 	protected Sprite m_bg = null;
-
+	
 	/**
 	 * @desc	constructor
 	 */
-	public TestTask()
+	public GameOverTask()
 	{
+		// TODO Auto-generated constructor stub
 	}
 	
+	@Override
 	public void vBegin()
 	{
-		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.title );
+		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.gameover );
 		m_bg.SetUV( 0.0f, 0.0f, 1.0f, 1.0f );
 	}
 	
+	@Override
+	public void vMain( float elapsed )
+	{
+		//TODO
+	}
+	
+	@Override
 	public void vDraw( float elapsed )
 	{
 		m_bg.Draw( 0, 0, 320, 560 );
@@ -48,12 +55,8 @@ public class TestTask extends Task
 		{
 			if( evt.Type == TouchEvent.TOUCH )
 			{
-				// init the first level	[temp]
-				GlobalWork._rotateSpeed = 0.015f;
-				GlobalWork._curLevel = LevelFactory.Singleton().CreateLevel( 1 );
-				
 				this.Stop();
-				TaskSet._leafTask.Start( 0 );
+				TaskSet._titleTask.Start( 0 );
 				
 				return true;
 			}
