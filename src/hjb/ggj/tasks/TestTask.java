@@ -24,7 +24,7 @@ public class TestTask extends Task
 	
 	public void vBegin()
 	{
-		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.ggjlogo );
+		m_bg = SpriteFactory.Singleton().CreateSprite( hjb.ggj.R.drawable.ggj2012logo );
 		m_bg.SetUV( 0.0f, 0.0f, 1.0f, 1.0f );
 	}
 	
