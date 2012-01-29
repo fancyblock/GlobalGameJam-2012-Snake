@@ -110,6 +110,9 @@ public class LeafTask extends Task
 		m_levels[5].SetUV( 0, 657, 320, 217 );
 		//TODO
 		
+		m_progressUI = new ProgressUI();
+		m_progressUI.SetMark( 0 );
+		
 		m_state = STATE_RUNNING;
 		m_mark = 0;
 		
@@ -136,6 +139,7 @@ public class LeafTask extends Task
 		m_curAngle += this.m_lvInfo._rotateSpeed;
 		
 		m_snakeHead.Update( elapsed );
+		m_progressUI.Update( elapsed );
 	}
 	
 	@Override
@@ -144,7 +148,7 @@ public class LeafTask extends Task
 		m_bg.Draw( 0, 0, 320, 560 );
 		m_levels[m_mark].Draw( 0, 20 );
 		
-		//TODO
+		m_progressUI.Draw( 45, 20 );
 		
 		m_aimFrame1.Draw( 160, 258 );
 		
@@ -194,6 +198,7 @@ public class LeafTask extends Task
 					if( m_mark < 5 )
 					{
 						m_mark++;
+						m_progressUI.SetMark( m_mark );
 						
 						m_lvInfo = LevelFactory.Singleton().CreateLevel( 0 );
 						

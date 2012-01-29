@@ -57,7 +57,7 @@ public class LevelFactory
 		
 		for( int i = 0; i <= 23; i++ )
 		{
-			if( Math.random() > 0.6f )
+			if( Math.random() > 0.25f )
 			{
 				li._subLeaves[li._leafCnt] = SubLeafFactory.Singleton().CreateSubLeaf( (int)( Math.random() * 9 ) );
 				li._subLeaves[li._leafCnt]._offset = i;
